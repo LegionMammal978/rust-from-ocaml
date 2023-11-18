@@ -1,0 +1,31 @@
+#!/bin/bash
+base=$(pwd)
+git -C rust worktree add "$base"/rust-s20120702 \
+    c74b3fd634754be7c151bfc1fb8ff515b69b0f9a
+git -C rust-s20120702 config --worktree core.abbrev 7
+git -C libuv archive node-v0.7.5 | tar -xf - -C rust-s20120702/src/libuv
+install -Dt rust-s20120702/dl rust-s20120630/$(< rust-s20120630/snap.txt)
+cat > rust-s20120702/src/snapshots.txt <<EOF
+S 2012-06-30 ed834f0
+  linux-x86_64 $(cut -c 45-84 rust-s20120630/snap.txt)
+EOF
+cd rust-s20120702
+patch -p1 <<EOF
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -245 +245 @@
+-  CFG_GCCISH_CFLAGS += -Wall -Werror -fno-rtti -g
++  CFG_GCCISH_CFLAGS += -Wall -fno-rtti -g
+EOF
+patch -p1 <<EOF
+--- a/src/rt/rust_shape.h
++++ b/src/rt/rust_shape.h
+@@ -665 +665 @@
+-    explicit ptr(uint8_t *in_p) : p(in_p) {}
++    ptr(uint8_t *in_p) : p(in_p) {}
+EOF
+./configure --disable-docs --disable-manage-submodules \
+    --llvm-root="$base"/llvm-3.1svn-4/Release+Asserts
+make -j8 snap-stage2
+echo rust-stage0* > snap.txt
+printf '\a'

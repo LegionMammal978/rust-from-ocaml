@@ -1,0 +1,37 @@
+#!/bin/bash
+base=$(pwd)
+git -C rust worktree add "$base"/rust-s20120212 \
+    2784314a1ff4f9b5230abb44c86b09d74d6b5e73
+git -C rust-s20120212 config --worktree core.abbrev 7
+git -C libuv archive node-v0.7.5 | tar -xf - -C rust-s20120212/src/libuv
+mkdir rust-s20120212/dl
+cp rust-s20120201/$(< rust-s20120201/snap.txt) rust-s20120212/dl
+cat > rust-s20120212/src/snapshots.txt <<EOF
+S 2012-02-01 196d69b
+  linux-x86_64 $(cut -c 45-84 rust-s20120201/snap.txt)
+EOF
+cd rust-s20120212
+patch -p1 <<EOF
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -229 +229 @@
+-  CFG_GCCISH_CFLAGS += -Wall -Werror -fno-rtti -g
++  CFG_GCCISH_CFLAGS += -Wall -fno-rtti -g
+EOF
+patch -p1 <<EOF
+--- a/src/rt/rust_cc.cpp
++++ b/src/rt/rust_cc.cpp
+@@ -6,0 +7 @@
++#undef alignof
+EOF
+patch -p1 <<EOF
+--- a/src/rt/rust_shape.h
++++ b/src/rt/rust_shape.h
+@@ -108,0 +109 @@
++#define alignof rust_alignof
+EOF
+./configure --disable-docs --disable-manage-submodules \
+    --llvm-root="$base"/llvm-3.1svn-4/Release+Asserts
+make -j8 snap-stage2
+echo rust-stage0* > snap.txt
+printf '\a'

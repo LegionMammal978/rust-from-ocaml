@@ -1,0 +1,17 @@
+#!/bin/bash
+mkdir llvm-3.0svn-6
+git -C llvm-project archive d3e65e702f45ea3476f3bda2b8f69a3e3729e9e2 llvm |
+tar -xf - -C llvm-3.0svn-6 --strip-components=1
+cd llvm-3.0svn-6
+base64 -d <<EOF | zcat | patch -p1
+H4sIAAAAAAAEA41RTU8CMRC976+Y426abkUSlLhuloSLB9Do4sV4KDCBJt22absY/73t8iEREXt4
+zcy8eZmXRykFzoRayHaJTMpNw0bjmj0oj3bD5YSbfJ0QQmB+iVRVQHvD2ysgHVZVQiG8qV7i2xQ/
+4v8O9+DXwtGy4YaWatst4qgu0+wuIRc2PDZGco9wukp/N/KkRbQyU0Kr805+sKKV68EASIS9EQCL
+vrUK6s/0lcssF644uvpkfLj1wOtkb4ZBNsBZ2RX6/+l+E7fevdbSsXm7MtEzq0P53CqFNl8Ys8vw
+b04XYb8XEgywPxCtdWkGRQGPL7uEjlu58zZG9wVD7+7+SQIAAA==
+EOF
+./configure --build=i686-unknown-linux-gnu --disable-jit --disable-docs \
+    --disable-threads --disable-pthreads --enable-targets=x86 \
+    --enable-bindings=none
+make -j8 CC='gcc -m32' CXX='g++ -m32'
+printf '\a'

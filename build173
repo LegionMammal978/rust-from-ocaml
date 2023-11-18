@@ -1,0 +1,68 @@
+#!/bin/bash
+mkdir llvm-3.3svn-2
+git -C llvm-project archive d522158df01a5b8c72239797d9c4944779cd3950 llvm |
+tar -xf - -C llvm-3.3svn-2 --strip-components=1
+cd llvm-3.3svn-2
+patch -p1 <<EOF
+--- a/include/llvm/IR/Attributes.h
++++ b/include/llvm/IR/Attributes.h
+@@ -70,0 +71 @@
++    FixedStackSegment,
+EOF
+patch -p1 <<EOF
+--- a/include/llvm/Target/TargetOptions.h
++++ b/include/llvm/Target/TargetOptions.h
+@@ -210,0 +211,2 @@
++    unsigned FixedStackSegmentSize;
++
+EOF
+patch -p1 <<EOF
+--- a/lib/AsmParser/LLLexer.cpp
++++ b/lib/AsmParser/LLLexer.cpp
+@@ -566,0 +567 @@
++  KEYWORD(fixedstacksegment);
+EOF
+patch -p1 <<EOF
+--- a/lib/AsmParser/LLParser.cpp
++++ b/lib/AsmParser/LLParser.cpp
+@@ -1166,0 +1167 @@
++    case lltok::kw_fixedstacksegment:
+EOF
+patch -p1 <<EOF
+--- a/lib/AsmParser/LLToken.h
++++ b/lib/AsmParser/LLToken.h
+@@ -98,0 +99 @@
++    kw_fixedstacksegment,
+EOF
+patch -p1 <<EOF
+--- a/lib/IR/Attributes.cpp
++++ b/lib/IR/Attributes.cpp
+@@ -161,0 +162,2 @@
++  if (hasAttribute(Attribute::FixedStackSegment))
++    return "fixedstacksegment";
+@@ -398,0 +401 @@
++  case Attribute::FixedStackSegment: return 1ULL << 40;
+EOF
+patch -p1 <<EOF
+--- a/lib/Target/X86/X86FrameLowering.cpp
++++ b/lib/Target/X86/X86FrameLowering.cpp
+@@ -1475,0 +1476,5 @@
++  const Function *Fn = MF.getFunction();
++  if (Fn->getAttributes().hasAttribute(AttributeSet::FunctionIndex,
++                                       Attribute::FixedStackSegment))
++    StackSize = MF.getTarget().Options.FixedStackSegmentSize;
++
+EOF
+patch -p1 <<EOF
+--- a/lib/Transforms/IPO/Inliner.cpp
++++ b/lib/Transforms/IPO/Inliner.cpp
+@@ -129,0 +130,4 @@
++  if (Callee->getAttributes().hasAttribute(AttributeSet::FunctionIndex,
++                                           Attribute::FixedStackSegment))
++    Caller->addFnAttr(Attribute::FixedStackSegment);
++
+EOF
+./configure --disable-jit --disable-docs --disable-threads --disable-pthreads \
+    --enable-targets=x86_64,arm,mips --enable-bindings=none --enable-optimized
+make -j8
+printf '\a'

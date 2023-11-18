@@ -1,0 +1,40 @@
+#!/bin/bash
+base=$(pwd)
+git -C rust worktree add "$base"/rust-s20120112 \
+    44352df57c04996b12d14ba92967d6637d154906
+git -C rust-s20120112 config --worktree core.abbrev 7
+git -C libuv archive node-v0.6.21 | tar -xf - -C rust-s20120112/src/libuv
+mkdir rust-s20120112/dl
+cp rust-s20120111/$(< rust-s20120111/snap.txt) rust-s20120112/dl
+cat > rust-s20120112/src/snapshots.txt <<EOF
+S 2012-01-11 f2352f4
+  linux-x86_64 $(cut -c 45-84 rust-s20120111/snap.txt)
+EOF
+cd rust-s20120112
+patch -p1 <<EOF
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -212 +212 @@
+-  CFG_GCCISH_CFLAGS += -Wall -Werror -fno-rtti -g
++  CFG_GCCISH_CFLAGS += -Wall -fno-rtti -g
+EOF
+patch -p1 <<EOF
+--- a/src/rt/rust_cc.cpp
++++ b/src/rt/rust_cc.cpp
+@@ -7,0 +8 @@
++#undef alignof
+EOF
+patch -p1 <<EOF
+--- a/src/rt/rust_shape.h
++++ b/src/rt/rust_shape.h
+@@ -102,0 +103 @@
++#define alignof rust_alignof
+@@ -895 +896 @@
+-    void walk_number() { DATA_SIMPLE(W, walk_number<W>()); }
++    void walk_number() { DATA_SIMPLE(W, template walk_number<W>()); }
+EOF
+./configure --disable-docs --disable-manage-submodules \
+    --llvm-root="$base"/llvm-3.1svn-3/Release+Asserts
+make -j8 snap-stage2
+echo rust-stage0* > snap.txt
+printf '\a'

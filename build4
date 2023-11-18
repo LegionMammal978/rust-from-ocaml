@@ -1,0 +1,20 @@
+#!/bin/bash
+mkdir llvm-3.0svn-2
+git -C llvm-project archive f200a0af58871778b3e8b727d7534aa82a6ca37f llvm |
+tar -xf - -C llvm-3.0svn-2 --strip-components=1
+base64 -d <<EOF | zcat | patch -d llvm-3.0svn-2 -p1
+H4sIAAAAAAAAA81UXU/CMBR951fcxBfI2Mo3EifBIA+YgEY2Y0J86EYDTUq3rB1qjP522218yDdv
+Ltvp1p2ee0/bW9M0ASPKfRZPCGJsMUd39w7qc0miBWYDHFqznGEY4J0idTpgllvNJhgJdjo5E9Q1
+DCZkPCTvun2DW5AzKsz2HIdmm6e9tgannS/c5IwTIySZhwxLArtDzf1GngKqs3Q5DfhhJ1ssbaXS
+qIChYWkEICIyjjg4n/kXzAoWFfZG1ju/V7mueIlss65kFRyUnRJ5nu6amHpn1EO9D+LHUrno8Snl
+BD30s2XySSgtPwyzGTiPqxOu14olMOpJwsZVNnNgx5wKObFm7SPBB91Lwu9jX5iAgyM1Kej1uqGf
+rtobvTmVSnAr9HFeErTRUjEVpMskJJbUBz/gQkLMBZ1yMoHRyMEeI2O9Sb/gp1QEdZeLyVslbZZP
+Fb6T9TxPyF0ruZmUuwmJ2iHbg+65xneZ2nq1pqxr+O/WZRAwgbx4GurqRY76fI45/2P6OCc5sqpl
+dWIpWBYkiSKRL4Btw+Moq8HNLkvISNfcL0CSK645BQAA
+EOF
+(cd llvm-3.0svn-2
+./configure --build=i686-unknown-linux-gnu --disable-jit --disable-docs \
+    --disable-threads --disable-pthreads --enable-targets=x86 \
+    --enable-bindings=none)
+make -C llvm-3.0svn-2 -j8 CC='gcc -m32' CXX='g++ -m32'
+printf '\a'

@@ -1,0 +1,30 @@
+#!/bin/bash
+base=$(pwd)
+git -C rust worktree add "$base"/rust-s20110603 \
+    f29d04672be58514269925b54fe8ee805b5b59cb
+git -C rust-s20110603 config --worktree core.abbrev 7
+mkdir rust-s20110603/dl
+cp rust-s20110531-2/$(< rust-s20110531-2/snap.txt) rust-s20110603/dl
+cat > rust-s20110603/src/snapshots.txt <<EOF
+S 2011-05-31 e66f9e4
+  linux-i386 $(cut -c 43-82 rust-s20110531-2/snap.txt)
+EOF
+patch -d rust-s20110603 -p1 <<EOF
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -147 +147 @@
+-  CFG_GCCISH_CFLAGS += -Wall -Werror -fno-rtti -fno-exceptions -g
++  CFG_GCCISH_CFLAGS += -Wall -fno-rtti -fno-exceptions -g
+EOF
+patch -d rust-s20110603 -p1 <<'EOF'
+--- a/mk/rt.mk
++++ b/mk/rt.mk
+@@ -85 +85 @@
+-	$(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS),$(RUNTIME_DEF))
++	$(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS) -lpthread,$(RUNTIME_DEF))
+EOF
+(cd rust-s20110603
+PATH="$base"/llvm-3.0svn-2/Release+Asserts/bin:"$PATH" ./configure --disable-docs)
+make -C rust-s20110603 -j8 stage1/rustc
+(cd rust-s20110603; CFG_SRC_DIR=. src/etc/make-snapshot.py stage1 > snap.txt)
+printf '\a'

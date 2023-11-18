@@ -1,0 +1,25 @@
+#!/bin/bash
+base=$(pwd)
+git -C rust worktree add "$base"/rust-s20130731 \
+    389aba09523f805e3b493a5089c6397749b06b67
+git -C rust-s20130731 config --worktree core.abbrev 7
+git -C libuv archive v0.11.5 | tar -xf - -C rust-s20130731/src/libuv
+cd rust-s20130731
+patch -p1 <<EOF
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -147 +147 @@
+-CFG_GCCISH_CFLAGS_x86_64-unknown-linux-gnu := -Wall -Werror -g -fPIC -m64
++CFG_GCCISH_CFLAGS_x86_64-unknown-linux-gnu := -Wall -g -fPIC -m64
+EOF
+patch -p1 <<EOF
+--- a/src/libextra/terminfo/searcher.rs
++++ b/src/libextra/terminfo/searcher.rs
+@@ -50 +49,0 @@
+-                    dirs_to_search.push(path("/lib/terminfo"));
+EOF
+./configure --disable-docs --disable-manage-submodules --enable-local-rust \
+    --local-rust-root="$base"/rust-s20130725/x86_64-unknown-linux-gnu/stage1 \
+    --llvm-root="$base"/llvm-3.3svn-1/Release+Asserts
+make -j8 rustc-stage1
+printf '\a'

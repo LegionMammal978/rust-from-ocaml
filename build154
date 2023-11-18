@@ -1,0 +1,26 @@
+#!/bin/bash
+base=$(pwd)
+git -C rust worktree add "$base"/rust-s20121208 \
+    6630d75a1d39aa7fedc924676eb48a38010ddd92
+git -C rust-s20121208 config --worktree core.abbrev 7
+git -C libuv archive node-v0.7.5 | tar -xf - -C rust-s20121208/src/libuv
+cd rust-s20121208
+patch -p1 <<EOF
+--- a/configure
++++ b/configure
+@@ -497 +497 @@
+-	(3.1svn|3.1|3.0svn|3.0)
++	(3.2svn|3.1svn|3.1|3.0svn|3.0)
+EOF
+patch -p1 <<EOF
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -261 +261 @@
+-  CFG_GCCISH_CFLAGS += -Wall -Werror -g
++  CFG_GCCISH_CFLAGS += -Wall -g
+EOF
+./configure --disable-docs --disable-manage-submodules --enable-local-rust \
+    --local-rust-root="$base"/rust-s20121126/x86_64-unknown-linux-gnu/stage2 \
+    --llvm-root="$base"/llvm-3.2svn-1/Release+Asserts
+make -j8 rustc
+printf '\a'

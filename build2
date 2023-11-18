@@ -1,0 +1,26 @@
+#!/bin/bash
+base=$(pwd)
+# sudo apt-get install -y ocaml-nox python-is-python2
+# git clone https://github.com/rust-lang/rust.git
+# git -C rust config extensions.worktreeConfig true
+git -C rust worktree add "$base"/rust-s20110503 \
+    54bfe8ee27b2a2958fec5e9713690a4336d8b4e4
+git -C rust-s20110503 config --worktree core.abbrev 7
+base64 -d <<EOF | zcat | patch -d rust-s20110503 -p1
+H4sIAAAAAAACA50SZXekMPDz8SvmHF42UHd3d7e8LATKFXtJtt7+9gtk9VFHxn0GYwzUia+cappK
+O74yEEJQbRdMTQHuHwKk/qkpA89sbu6R9TWyMb23fDBP1pZndmFkHGpJeGu78S2FpBYLTVXDgHJO
+7wrOQG97luzzvANdgNTfzLs5O72+trm1RxbWphcLbxzAL7MReXljdtcCfAPTLFKI8gQzzlOe8wb6
+bASjOZssotJPedw+nzahnlF37wAgBYpqAWYXFsni7CyZ1YmQSnRIo0hBXRL2kxRzKUNNsVuXZTJM
+E6EKMtAb/m/4tSrmnbvkzU0ODgJSf17jt1/mtvXLdFXUItva8sYqma38mqr8Mnf2N/aW1/WSLGjx
+mzMru1abfm5+wbIM9OVQgCMvUiCTl5xRrxRZNyS4W5yjU2UOFWriUb21skKfzWBXpR+QRnodEZNA
+OYdxMGcaZzadw247phnxw4gps87H9+A5S8VI11pJ1YwRJnKI1BIRBgnzXjdzSUTv0pos56CRYGDi
+7nyMbWW2XAvYTVKfBCwpGDD3k/C2VTeC959yT++7vdvvZ0KUZ/Epbz2n00fA3fB4XjoMnzl+7f6+
+fBktjT6N3l5A6tdHASB0ETN3kglbpkRIHiYBiLb4TLqOSGgmLlNpZ3et+CVNHr+7Wx2eAs0MAJJy
+m3qemQo7o/LS/peGiflDSBqwnh8VSGjMrIqB3jXubhn/Bw/GMa+2BQAA
+EOF
+(cd rust-s20110503
+PATH="$base"/llvm-3.0svn-1/Release+Asserts/bin:"$PATH" ./configure \
+    --disable-docs)
+make -C rust-s20110503 -j8 stage1/rustc
+(cd rust-s20110503; CFG_SRC_DIR=. src/etc/make-snapshot.py > snap.txt)
+printf '\a'

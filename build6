@@ -1,0 +1,23 @@
+#!/bin/bash
+base=$(pwd)
+git -C rust worktree add "$base"/rust-s20110512 \
+    b1d3364487eb647f2d7fcb412a260c960e38c73e
+git -C rust-s20110512 config --worktree core.abbrev 7
+mkdir rust-s20110512/dl
+cp rust-s20110506/$(< rust-s20110506/snap.txt) rust-s20110512/dl
+cat > rust-s20110512/src/snapshots.txt <<EOF
+S 2011-05-06 ab43725
+  linux-i386 $(cut -c 43-82 rust-s20110506/snap.txt)
+EOF
+base64 -d <<EOF | zcat | patch -d rust-s20110512 -p1
+H4sIAAAAAAAAA51RXU+DMBR9ll9xs/DQphSCZtmTCQ4HotuMovGRVOgGDmjT9kH/vVQ08yszsUlP
+ej96em4PpRRY0O0C2TKzEarzu51DCIHH78koAhpOT4BYiCKHAsRJWqRxnOUXRZwsz9IcyCnQB9a2
+A3KlhAK66QVVxjTjiT+XXJpG9Bro1iGHKQ5dpR+6lfmieAyt1tkMyLCt0iMX3WAXlZbVPrjM1ldF
+7LmR56Lb+/VdtloMuXmOYR9fzy9z/Kl+vkgwdsi/qYC20tSKs+oH6TiLVmXATRnonkldC+PLl/ex
+fqu8uRFOBzcGGN2wyzDls6pCQvuSmdp/Ek2PJtqwLT+eeNCzjmPP/vsfzeG++RXZ3yvPIgIAAA==
+EOF
+(cd rust-s20110512
+PATH="$base"/llvm-3.0svn-2/Release+Asserts/bin:"$PATH" ./configure --disable-docs)
+make -C rust-s20110512 -j8 stage1/rustc
+(cd rust-s20110512; CFG_SRC_DIR=. src/etc/make-snapshot.py > snap.txt)
+printf '\a'

@@ -1,0 +1,20 @@
+#!/bin/bash
+# git init rust-llvm
+# git -C rust-llvm remote add brson https://github.com/brson/llvm.git
+# git -C rust-llvm fetch --depth=1 brson rust-20120106-do-not-delete
+base=$(pwd)
+mkdir llvm-3.1svn-3
+git -C rust-llvm archive brson/rust-20120106-do-not-delete |
+tar -xf - -C llvm-3.1svn-3
+cd llvm-3.1svn-3
+base64 -d <<EOF | zcat | patch -p1
+H4sIAAAAAAAEA41RTU8CMRC976+Y426abkUSlLhuloSLB9Do4sV4KDCBJt22absY/73t8iEREXt4
+zcy8eZmXRykFzoRayHaJTMpNw0bjmj0oj3bD5YSbfJ0QQmB+iVRVQHvD2ysgHVZVQiG8qV7i2xQ/
+4v8O9+DXwtGy4YaWatst4qgu0+wuIRc2PDZGco9wukp/N/KkRbQyU0Kr805+sKKV68EASIS9EQCL
+vrUK6s/0lcssF644uvpkfLj1wOtkb4ZBNsBZ2RX6/+l+E7fevdbSsXm7MtEzq0P53CqFNl8Ys8vw
+b04XYb8XEgywPxCtdWkGRQGPL7uEjlu58zZG9wVD7+7+SQIAAA==
+EOF
+./configure --disable-jit --disable-docs --disable-threads --disable-pthreads \
+    --enable-targets=x86_64 --enable-bindings=none
+make -j8
+printf '\a'

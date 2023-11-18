@@ -1,0 +1,46 @@
+#!/bin/bash
+base=$(pwd)
+git -C rust worktree add "$base"/rust-s20110816 \
+    014c6922e12d4faa6a2181674d12a7f487c06bb6
+git -C rust-s20110816 config --worktree core.abbrev 7
+mkdir rust-s20110816/dl
+cp rust-s20110815/$(< rust-s20110815/snap.txt) rust-s20110816/dl
+cat > rust-s20110816/src/snapshots.txt <<EOF
+S 2011-08-15 42034f5
+  linux-i386 $(cut -c 43-82 rust-s20110815/snap.txt)
+EOF
+cd rust-s20110816
+patch -p1 <<EOF
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -156 +156 @@
+-  CFG_GCCISH_CFLAGS += -Wall -Werror -fno-rtti -fno-exceptions -g
++  CFG_GCCISH_CFLAGS += -Wall -fno-rtti -fno-exceptions -g
+EOF
+patch -p1 <<EOF
+--- a/src/comp/driver/rustc.rs
++++ b/src/comp/driver/rustc.rs
+@@ -558 +558 @@
+-        ~[stage, "-Lrt", "-lrustrt", glu, "-m32", "-o", saved_out_filename,
++        ~[stage, glu, "-m32", "-o", saved_out_filename,
+@@ -613,0 +614 @@
++    gcc_args += ~["-Lrt", "-lrustrt"];
+EOF
+patch -p1 <<EOF
+--- a/src/rt/rust_shape.cpp
++++ b/src/rt/rust_shape.cpp
+@@ -951 +951 @@
+-    void walk_number(bool align) { DATA_SIMPLE(W, walk_number<W>()); }
++    void walk_number(bool align) { DATA_SIMPLE(W, template walk_number<W>()); }
+EOF
+patch -p1 <<EOF
+--- a/src/rt/rust_util.h
++++ b/src/rt/rust_util.h
+@@ -212 +212 @@
+-    uint8_t data[];         // if on stack
++    uint8_t data[0];        // if on stack
+EOF
+PATH="$base"/llvm-3.0svn-6/Release+Asserts/bin:"$PATH" ./configure --disable-docs
+make -j8 snap-stage1
+echo rust-stage0* > snap.txt
+printf '\a'

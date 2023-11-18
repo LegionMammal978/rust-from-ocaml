@@ -1,0 +1,46 @@
+#!/bin/bash
+base=$(pwd)
+git -C rust worktree add "$base"/rust-s20110617 \
+    175fd8ee73743a08174b5fa7203798008c927fea
+git -C rust-s20110617 config --worktree core.abbrev 7
+mkdir rust-s20110617/dl
+cp rust-head-02c0501/$(< rust-head-02c0501/snap.txt) rust-s20110617/dl
+cat > rust-s20110617/src/snapshots.txt <<EOF
+S 2011-06-16 02c0501
+  linux-i386 $(cut -c 43-82 rust-head-02c0501/snap.txt)
+EOF
+patch -d rust-s20110617 -p1 <<EOF
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -147 +147 @@
+-  CFG_GCCISH_CFLAGS += -Wall -Werror -fno-rtti -fno-exceptions -g
++  CFG_GCCISH_CFLAGS += -Wall -fno-rtti -fno-exceptions -g
+EOF
+patch -d rust-s20110617 -p1 <<'EOF'
+--- a/mk/rt.mk
++++ b/mk/rt.mk
+@@ -96 +96 @@
+-	$(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS),$(RUNTIME_DEF))
++	$(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS) -lpthread,$(RUNTIME_DEF))
+EOF
+patch -d rust-s20110617 -p1 <<EOF
+--- a/src/comp/driver/rustc.rs
++++ b/src/comp/driver/rustc.rs
+@@ -403 +403 @@
+-            [stage, "-Lrt", "-lrustrt", "-fno-strict-aliasing", "-fPIC",
++            [stage, "-fno-strict-aliasing", "-fPIC",
+@@ -425,0 +426 @@
++        gcc_args += ["-Lrt", "-lrustrt"];
+EOF
+patch -d rust-s20110617 -p1 <<EOF
+--- a/src/rt/rust_util.h
++++ b/src/rt/rust_util.h
+@@ -201 +201 @@
+-    uint8_t data[];         // if on stack
++    uint8_t data[0];        // if on stack
+EOF
+(cd rust-s20110617
+PATH="$base"/llvm-3.0svn-3/Release+Asserts/bin:"$PATH" ./configure --disable-docs)
+make -C rust-s20110617 -j8 stage2/lib/libstd.so
+(cd rust-s20110617; CFG_SRC_DIR=. src/etc/make-snapshot.py stage2 > snap.txt)
+printf '\a'

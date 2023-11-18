@@ -1,0 +1,46 @@
+#!/bin/bash
+base=$(pwd)
+git -C rust worktree add "$base"/rust-s20110721 \
+    c62a9fec775a2f0fba5980fb13329bed57a1b118
+git -C rust-s20110721 config --worktree core.abbrev 7
+mkdir rust-s20110721/dl
+cp rust-s20110720/$(< rust-s20110720/snap.txt) rust-s20110721/dl
+cat > rust-s20110721/src/snapshots.txt <<EOF
+S 2011-07-20 8a7f2e0
+  linux-i386 $(cut -c 43-82 rust-s20110720/snap.txt)
+EOF
+cd rust-s20110721
+patch -p1 <<EOF
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -147 +147 @@
+-  CFG_GCCISH_CFLAGS += -Wall -Werror -fno-rtti -fno-exceptions -g
++  CFG_GCCISH_CFLAGS += -Wall -fno-rtti -fno-exceptions -g
+EOF
+patch -p1 <<'EOF'
+--- a/mk/rt.mk
++++ b/mk/rt.mk
+@@ -97 +97 @@
+-	$(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS),$(RUNTIME_DEF))
++	$(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS) -lpthread,$(RUNTIME_DEF))
+EOF
+patch -p1 <<EOF
+--- a/src/comp/driver/rustc.rs
++++ b/src/comp/driver/rustc.rs
+@@ -522 +522 @@
+-        [stage, "-Lrt", "-lrustrt", glu,  "-m32", "-o",
++        [stage, glu,  "-m32", "-o",
+@@ -585,0 +586 @@
++    gcc_args += ["-Lrt", "-lrustrt"];
+EOF
+patch -p1 <<EOF
+--- a/src/rt/rust_util.h
++++ b/src/rt/rust_util.h
+@@ -210 +210 @@
+-    uint8_t data[];         // if on stack
++    uint8_t data[0];        // if on stack
+EOF
+PATH="$base"/llvm-3.0svn-5/Release+Asserts/bin:"$PATH" ./configure --disable-docs
+make -j8 stage1/libstd.so snap-stage1
+echo rust-stage0* > snap.txt
+printf '\a'

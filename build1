@@ -1,0 +1,23 @@
+#!/bin/bash
+# sudo apt-get update
+# sudo apt-get install -y g++-multilib git make
+# git clone https://github.com/llvm/llvm-project.git
+mkdir llvm-3.0svn-1
+git -C llvm-project archive f200a0af58871778b3e8b727d7534aa82a6ca37f llvm |
+tar -xf - -C llvm-3.0svn-1 --strip-components=1
+base64 -d <<EOF | zcat | patch -d llvm-3.0svn-1 -p1
+H4sIAAAAAAACA80Uha7cMEwM9xUeQwqPmZmZuWD1IqVplbjj7dv3fDzMTbhCwMy+70MUSp2oKsVQ
+qXd5uLhyEm5qQvMuUrtRGdRrQgiIXUQLC+APTo6Pg+AVFhZqPgDAXpHi9R6+5/0WZoHq0vpzeVT6
+c7oJneHlZO71m+macHAQ5qWKCOFX1j84clBItvJUy0J3PXFQsStDY0MgeGk7AmCQKqPh5OPrs0i9
+CaSdaVn9W3TH1g5dQ+z4KAhe/ig2Q+pPLhP2+q5kHK5+wKQiWehVnUmN4dZmK00JlhQkZdmKQH+0
+bPDoiDcAYrRhsHjWihzMVFpaSoP63F+U7y471Duo/9mAk8hkSOHFxBj/y0WKq7kkQtNV7aRrKR2b
+BMFLM02WIpIJJIW2BJW2MtOYwvHxSRQrvOYi/QzfBjx4/AY94NMQb91/GL5yPvsUdNqRxMeh1t5d
+WNof3d5d/pPjbkp2fXhkEgQv/7vrVBTKhnGVldy94cnj9ajSutdpB01jZA0PguCl3ZBojH39BmZm
+YP+41YO9oMCS4Z77DkCSK645BQAA
+EOF
+(cd llvm-3.0svn-1
+./configure --build=i686-pc-linux-gnu --disable-jit --disable-docs \
+    --disable-threads --disable-pthreads --enable-targets=x86 \
+    --enable-bindings=none)
+make -C llvm-3.0svn-1 -j8 CC='gcc -m32' CXX='g++ -m32'
+printf '\a'

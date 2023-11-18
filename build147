@@ -1,0 +1,9 @@
+#!/bin/bash
+mkdir llvm-3.2svn-1
+git -C llvm-project archive b1d83e8c72187afec031eec7cc54d4b73b781d16 llvm |
+tar -xf - -C llvm-3.2svn-1 --strip-components=1
+cd llvm-3.2svn-1
+./configure --disable-jit --disable-docs --disable-threads --disable-pthreads \
+    --enable-targets=x86_64,arm,mips --enable-bindings=none --enable-optimized
+make -j8
+printf '\a'

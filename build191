@@ -1,0 +1,34 @@
+#!/bin/bash
+base=$(pwd)
+git -C rust worktree add "$base"/rust-s20131128 \
+    859c3baf64c167730f4214a736f72a5e2e86d7d9
+git -C rust-s20131128 config --worktree core.abbrev 7
+git -C libuv archive v0.11.19 | tar -xf - -C rust-s20131128/src/libuv
+git -C gyp archive master | tar -xf - -C rust-s20131128/src/gyp
+cd rust-s20131128
+patch -p1 <<EOF
+--- a/configure
++++ b/configure
+@@ -562 +562 @@
+-	(3.3|3.3svn|3.2|3.2svn)
++	(3.4svn|3.3|3.3svn|3.2|3.2svn)
+EOF
+patch -p1 <<EOF
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -151 +151 @@
+-CFG_GCCISH_CFLAGS_x86_64-unknown-linux-gnu := -Wall -Werror -g -fPIC -m64
++CFG_GCCISH_CFLAGS_x86_64-unknown-linux-gnu := -Wall -g -fPIC -m64
+EOF
+patch -p1 <<EOF
+--- a/src/libuv/gyp_uv.py
++++ b/src/libuv/gyp_uv.py
+@@ -34 +34 @@
+-  proc = subprocess.Popen(CC.split() + ['-dumpversion'], stdout=subprocess.PIPE)
++  proc = subprocess.Popen(CC.split() + ['-dumpfullversion'], stdout=subprocess.PIPE)
+EOF
+./configure --disable-docs --disable-manage-submodules --enable-local-rust \
+    --local-rust-root="$base"/rust-s20131110/x86_64-unknown-linux-gnu/stage1 \
+    --llvm-root="$base"/llvm-3.4svn-1/Release+Asserts
+make -j8 rustc-stage1
+printf '\a'

@@ -1,0 +1,47 @@
+#!/bin/bash
+base=$(pwd)
+git -C rust worktree add "$base"/rust-s20110928 \
+    a3a27374bd57e644c56d16ba677298344803830c
+git -C rust-s20110928 config --worktree core.abbrev 7
+mkdir rust-s20110928/dl
+cp rust-s20110915/$(< rust-s20110915/snap.txt) rust-s20110928/dl
+cat > rust-s20110928/src/snapshots.txt <<EOF
+S 2011-09-15 b843cf2
+  linux-i386 $(cut -c 43-82 rust-s20110915/snap.txt)
+EOF
+cd rust-s20110928
+patch -p1 <<EOF
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -173 +173 @@
+-  CFG_GCCISH_CFLAGS += -Wall -Werror -fno-rtti -g
++  CFG_GCCISH_CFLAGS += -Wall -fno-rtti -g
+EOF
+patch -p1 <<EOF
+--- a/src/comp/back/link.rs
++++ b/src/comp/back/link.rs
+@@ -507 +507 @@
+-        [stage, "-Lrt", "-lrustrt", glu, "-m32", "-o", saved_out_filename,
++        [stage, glu, "-m32", "-o", saved_out_filename,
+@@ -563,0 +564 @@
++    gcc_args += ["-Lrt", "-lrustrt"];
+EOF
+patch -p1 <<EOF
+--- a/src/rt/rust_cc.cpp
++++ b/src/rt/rust_cc.cpp
+@@ -7,0 +8 @@
++#undef alignof
+EOF
+patch -p1 <<EOF
+--- a/src/rt/rust_shape.h
++++ b/src/rt/rust_shape.h
+@@ -97,0 +98 @@
++#define alignof rust_alignof
+@@ -880 +881 @@
+-    void walk_number() { DATA_SIMPLE(W, walk_number<W>()); }
++    void walk_number() { DATA_SIMPLE(W, template walk_number<W>()); }
+EOF
+PATH="$base"/llvm-3.0svn-7/Release+Asserts/bin:"$PATH" ./configure --disable-docs
+make -j8 snap-stage1
+echo rust-stage0* > snap.txt
+printf '\a'

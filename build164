@@ -1,0 +1,10 @@
+#!/bin/bash
+# git -C rust-llvm fetch --depth=1 brson rust-20130523-do-not-delete
+mkdir llvm-3.3svn-1
+git -C rust-llvm archive brson/rust-20130523-do-not-delete |
+tar -xf - -C llvm-3.3svn-1
+cd llvm-3.3svn-1
+./configure --disable-jit --disable-docs --disable-threads --disable-pthreads \
+    --enable-targets=x86_64,arm,mips --enable-bindings=none --enable-optimized
+make -j8
+printf '\a'
