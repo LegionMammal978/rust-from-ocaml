@@ -9,12 +9,22 @@ cat > rust-s20110506/src/snapshots.txt <<EOF
 S 2011-05-05 157f61f
   linux-i386 $(cut -c 43-82 rust-s20110505/snap.txt)
 EOF
-base64 -d <<EOF | zcat | patch -d rust-s20110506 -p1
-H4sIAAAAAAAAA52RXUvDMBSGr+2vOIxeJKRpqSK7EurqWqZzolW8LLHN1rq2CUku9N+brMr8YoKB
-HM43T/JSSoFF/TaSHTNrofqw33qEEHj6nkwSoPHJFIgzSeJRgDTLyzxNyzRbnucFkDOgj6zrrOVK
-CQV0PQiqjGlHj79UXJpWDBroxiMH5g/N0Q9iZb6wjqGjnFpIex3jkY9usY8qR+Vol4vVVZkGfhL4
-6O5hdb+4ntvcrMCwj29mlwX+VL+YZxh75N+rgHbSNIqz+sfS8S1aVRE3VaQHJnUjTChf3yX4rbLT
-IT61Olgz6uCOYSpkdY2EDiUzTfgs2gFNtGEbfjwJYGA9x4H79D+a433zGzdz3QUcAgAA
+patch -d rust-s20110506 -p1 <<'EOF'
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -137 +137 @@
+-  CFG_GCC_CFLAGS += -Wall -Werror -fno-rtti -fno-exceptions -g
++  CFG_GCC_CFLAGS += -Wall -fno-rtti -fno-exceptions -g
+--- a/mk/rt.mk
++++ b/mk/rt.mk
+@@ -77 +77 @@
+-	$(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS),$(RUNTIME_DEF))
++	$(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS) -lpthread,$(RUNTIME_DEF))
+--- a/src/etc/snapshot.py
++++ b/src/etc/snapshot.py
+@@ -115 +115 @@
+-      tar.add(os.path.join("stage2", name),
++      tar.add(os.path.join("stage1", name),
 EOF
 (cd rust-s20110506
 PATH="$base"/llvm-3.0svn-2/Release+Asserts/bin:"$PATH" ./configure --disable-docs)

@@ -3,12 +3,25 @@ mkdir llvm-3.1svn-1
 git -C llvm-project archive ec2fb226d8b84ee1090f7d7fa2e0da6232fee469 llvm |
 tar -xf - -C llvm-3.1svn-1 --strip-components=1
 cd llvm-3.1svn-1
-base64 -d <<EOF | zcat | patch -p1
-H4sIAAAAAAAEA41RTU8CMRC976+Y426abkUSlLhuloSLB9Do4sV4KDCBJt22absY/73t8iEREXt4
-zcy8eZmXRykFzoRayHaJTMpNw0bjmj0oj3bD5YSbfJ0QQmB+iVRVQHvD2ysgHVZVQiG8qV7i2xQ/
-4v8O9+DXwtGy4YaWatst4qgu0+wuIRc2PDZGco9wukp/N/KkRbQyU0Kr805+sKKV68EASIS9EQCL
-vrUK6s/0lcssF644uvpkfLj1wOtkb4ZBNsBZ2RX6/+l+E7fevdbSsXm7MtEzq0P53CqFNl8Ys8vw
-b04XYb8XEgywPxCtdWkGRQGPL7uEjlu58zZG9wVD7+7+SQIAAA==
+patch -p1 <<EOF
+--- a/include/llvm/ADT/IntervalMap.h
++++ b/include/llvm/ADT/IntervalMap.h
+@@ -1980 +1980 @@
+-    Node[NewNode] = this->map->newNode<NodeT>();
++    Node[NewNode] = this->map->template newNode<NodeT>();
+--- a/include/llvm/ADT/PointerUnion.h
++++ b/include/llvm/ADT/PointerUnion.h
+@@ -266 +266 @@
+-      return Ty(Val).is<T>();
++      return Ty(Val).template is<T>();
+@@ -279 +279 @@
+-      return Ty(Val).get<T>();
++      return Ty(Val).template get<T>();
+--- a/tools/bugpoint/ToolRunner.cpp
++++ b/tools/bugpoint/ToolRunner.cpp
+@@ -131 +131 @@
+-    errs() << OS;
++    errs() << OS.str();
 EOF
 ./configure --build=i686-unknown-linux-gnu --disable-jit --disable-docs \
     --disable-threads --disable-pthreads --enable-targets=x86 \

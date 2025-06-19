@@ -6,17 +6,48 @@ base=$(pwd)
 git -C rust worktree add "$base"/rust-s20110503 \
     54bfe8ee27b2a2958fec5e9713690a4336d8b4e4
 git -C rust-s20110503 config --worktree core.abbrev 7
-base64 -d <<EOF | zcat | patch -d rust-s20110503 -p1
-H4sIAAAAAAACA50SZXekMPDz8SvmHF42UHd3d7e8LATKFXtJtt7+9gtk9VFHxn0GYwzUia+cappK
-O74yEEJQbRdMTQHuHwKk/qkpA89sbu6R9TWyMb23fDBP1pZndmFkHGpJeGu78S2FpBYLTVXDgHJO
-7wrOQG97luzzvANdgNTfzLs5O72+trm1RxbWphcLbxzAL7MReXljdtcCfAPTLFKI8gQzzlOe8wb6
-bASjOZssotJPedw+nzahnlF37wAgBYpqAWYXFsni7CyZ1YmQSnRIo0hBXRL2kxRzKUNNsVuXZTJM
-E6EKMtAb/m/4tSrmnbvkzU0ODgJSf17jt1/mtvXLdFXUItva8sYqma38mqr8Mnf2N/aW1/WSLGjx
-mzMru1abfm5+wbIM9OVQgCMvUiCTl5xRrxRZNyS4W5yjU2UOFWriUb21skKfzWBXpR+QRnodEZNA
-OYdxMGcaZzadw247phnxw4gps87H9+A5S8VI11pJ1YwRJnKI1BIRBgnzXjdzSUTv0pos56CRYGDi
-7nyMbWW2XAvYTVKfBCwpGDD3k/C2VTeC959yT++7vdvvZ0KUZ/Epbz2n00fA3fB4XjoMnzl+7f6+
-fBktjT6N3l5A6tdHASB0ETN3kglbpkRIHiYBiLb4TLqOSGgmLlNpZ3et+CVNHr+7Wx2eAs0MAJJy
-m3qemQo7o/LS/peGiflDSBqwnh8VSGjMrIqB3jXubhn/Bw/GMa+2BQAA
+patch -d rust-s20110503 -p1 <<'EOF'
+--- a/mk/boot.mk
++++ b/mk/boot.mk
+@@ -58 +58 @@
+-BOOT_ML_NATIVE_LIBS := unix.cmxa nums.cmxa bigarray.cmxa
++BOOT_ML_NATIVE_LIBS := unix.cmxa bigarray.cmxa
+@@ -60 +60 @@
+-BOOT_OCAMLOPT_FLAGS := -g $(BOOT_ML_INCS) -w Ael -warn-error Ael
++BOOT_OCAMLOPT_FLAGS := -g $(BOOT_ML_INCS) -w Ael
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -136 +136 @@
+-  CFG_GCC_CFLAGS += -Wall -Werror -fno-rtti -fno-exceptions -g
++  CFG_GCC_CFLAGS += -Wall -fno-rtti -fno-exceptions -g
+--- a/mk/rt.mk
++++ b/mk/rt.mk
+@@ -77 +77 @@
+-   $(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS),$(RUNTIME_DEF))
++   $(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS) -ldl -lpthread,$(RUNTIME_DEF))
+--- a/src/boot/be/asm.ml
++++ b/src/boot/be/asm.ml
+@@ -670,5 +670,5 @@
+-  let arr = (Bigarray.Array1.map_file
+-               fd ~pos:0L
+-               Bigarray.int8_unsigned
+-               Bigarray.c_layout
+-               false (-1))
++  let arr = Bigarray.array1_of_genarray (Unix.map_file
++                                           fd ~pos:0L
++                                           Bigarray.int8_unsigned
++                                           Bigarray.c_layout
++                                           false [| -1 |])
+--- a/src/boot/fe/fuzz.ml
++++ b/src/boot/fe/fuzz.ml
+@@ -33 +33 @@
+-    s
++    Bytes.to_string s
+--- a/src/etc/snapshot.py
++++ b/src/etc/snapshot.py
+@@ -115 +115 @@
+-      tar.add(os.path.join("stage2", name),
++      tar.add(os.path.join("stage1", name),
 EOF
 (cd rust-s20110503
 PATH="$base"/llvm-3.0svn-1/Release+Asserts/bin:"$PATH" ./configure \

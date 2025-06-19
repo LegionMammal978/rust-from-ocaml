@@ -2,15 +2,43 @@
 mkdir llvm-3.0svn-4
 git -C llvm-project archive d91d566d7f1cd7fbda98205bd9c9d64d9c7175e0 llvm |
 tar -xf - -C llvm-3.0svn-4 --strip-components=1
-base64 -d <<EOF | zcat | patch -d llvm-3.0svn-4 -p1
-H4sIAAAAAAAAA81UXU/CMBR951fcxBfI2Mo3EifBIA+YgEY2Y0J86EYDTUq3rB1qjP522218yDdv
-Ltvp1p2ee0/bW9M0ASPKfRZPCGJsMUd39w7qc0miBWYDHFqznGEY4J0idTpgllvNJhgJdjo5E9Q1
-DCZkPCTvun2DW5AzKsz2HIdmm6e9tgannS/c5IwTIySZhwxLArtDzf1GngKqs3Q5DfhhJ1ssbaXS
-qIChYWkEICIyjjg4n/kXzAoWFfZG1ju/V7mueIlss65kFRyUnRJ5nu6amHpn1EO9D+LHUrno8Snl
-BD30s2XySSgtPwyzGTiPqxOu14olMOpJwsZVNnNgx5wKObFm7SPBB91Lwu9jX5iAgyM1Kej1uqGf
-rtobvTmVSnAr9HFeErTRUjEVpMskJJbUBz/gQkLMBZ1yMoHRyMEeI2O9Sb/gp1QEdZeLyVslbZZP
-Fb6T9TxPyF0ruZmUuwmJ2iHbg+65xneZ2nq1pqxr+O/WZRAwgbx4GurqRY76fI45/2P6OCc5sqpl
-dWIpWBYkiSKRL4Btw+Moq8HNLkvISNfcL0CSK645BQAA
+patch -d llvm-3.0svn-4 -p1 <<EOF
+--- a/include/llvm/ADT/IntervalMap.h
++++ b/include/llvm/ADT/IntervalMap.h
+@@ -1977 +1977 @@
+-    Node[NewNode] = this->map->newNode<NodeT>();
++    Node[NewNode] = this->map->template newNode<NodeT>();
+--- a/include/llvm/ADT/PointerUnion.h
++++ b/include/llvm/ADT/PointerUnion.h
+@@ -262 +262 @@
+-      return Ty(Val).is<T>();
++      return Ty(Val).template is<T>();
+@@ -275 +275 @@
+-      return Ty(Val).get<T>();
++      return Ty(Val).template get<T>();
+--- a/lib/ExecutionEngine/JIT/Intercept.cpp
++++ b/lib/ExecutionEngine/JIT/Intercept.cpp
+@@ -54,0 +55 @@
++#include <unistd.h>
+--- a/lib/ExecutionEngine/MCJIT/Intercept.cpp
++++ b/lib/ExecutionEngine/MCJIT/Intercept.cpp
+@@ -54,0 +55 @@
++#include <unistd.h>
+--- a/lib/Target/X86/X86CodeEmitter.cpp
++++ b/lib/Target/X86/X86CodeEmitter.cpp
+@@ -569 +569 @@
+-  static const unsigned SSTable[] = { ~0, 0, 1, ~0, 2, ~0, ~0, ~0, 3 };
++  static const unsigned SSTable[] = { ~0U, 0, 1, ~0U, 2, ~0U, ~0U, ~0U, 3 };
+--- a/lib/Target/X86/X86MCCodeEmitter.cpp
++++ b/lib/Target/X86/X86MCCodeEmitter.cpp
+@@ -349 +349 @@
+-  static const unsigned SSTable[] = { ~0, 0, 1, ~0, 2, ~0, ~0, ~0, 3 };
++  static const unsigned SSTable[] = { ~0U, 0, 1, ~0U, 2, ~0U, ~0U, ~0U, 3 };
+--- a/tools/bugpoint/ToolRunner.cpp
++++ b/tools/bugpoint/ToolRunner.cpp
+@@ -131 +131 @@
+-    errs() << OS;
++    errs() << OS.str();
 EOF
 (cd llvm-3.0svn-4
 ./configure --build=i686-unknown-linux-gnu --disable-jit --disable-docs \

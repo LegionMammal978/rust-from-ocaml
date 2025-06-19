@@ -3,9 +3,12 @@ mkdir llvm-3.1svn-4
 git -C llvm-project archive 2937df45a811273c198c4795a3dc11fe7e784424 llvm |
 tar -xf - -C llvm-3.1svn-4 --strip-components=1
 cd llvm-3.1svn-4
-base64 -d <<EOF | zcat | patch -p1
-H4sIAAAAAAAEA9PV1VVI1C/Jz88p1k8qTS/Iz8wr0Q8BcoNK8/JSi/SSCwq4tLW1FZIIqHFwUNA1
-NDZU0AYRDg5cugpAkFpUVKyhqWBjo+AfbM2ljS6kV1xSpKFpzQUA8K3H6YQAAAA=
+patch -p1 <<EOF
+--- a/tools/bugpoint/ToolRunner.cpp
++++ b/tools/bugpoint/ToolRunner.cpp
+@@ -131 +131 @@
+-    errs() << OS;
++    errs() << OS.str();
 EOF
 ./configure --disable-jit --disable-docs --disable-threads --disable-pthreads \
     --enable-targets=x86_64 --enable-bindings=none

@@ -9,11 +9,17 @@ cat > rust-t20110516/src/snapshots.txt <<EOF
 S 2011-05-12 b1d3364
   linux-i386 $(cut -c 43-82 rust-s20110512/snap.txt)
 EOF
-base64 -d <<EOF | zcat | patch -d rust-t20110516 -p1
-H4sIAAAAAAAAA52OSQvCMBCFz/ZXzCGHhnQUQehJiEZb64pW8ViixoWuxBz8+bYUcQMPXh7z3jBv
-PkQE2UrjVpFIc8x12kxjizEGu8+Qc8B2xwVWCecWAgjPj3whgnAUCW/a80NgXcCtTJJSlda5Bjxm
-OWpjLvWkbntVmEueXQFPFvtd8esUH9zavBHXtmJ1S1S3Jm0Qe0mJva9aq4fTYD6JhEO4Q+zVZr4O
-ZsMy64cUnn7RH4f0ZT8YepRa7O8qwKQwZ63k4av0DullxheEAQAA
+patch -d rust-t20110516 -p1 <<'EOF'
+--- a/mk/platform.mk
++++ b/mk/platform.mk
+@@ -147 +147 @@
+-  CFG_GCCISH_CFLAGS += -Wall -Werror -fno-rtti -fno-exceptions -g
++  CFG_GCCISH_CFLAGS += -Wall -fno-rtti -fno-exceptions -g
+--- a/mk/rt.mk
++++ b/mk/rt.mk
+@@ -77 +77 @@
+- $(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS),$(RUNTIME_DEF))
++ $(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS) -lpthread,$(RUNTIME_DEF))
 EOF
 (cd rust-t20110516
 PATH="$base"/llvm-3.0svn-2/Release+Asserts/bin:"$PATH" ./configure --disable-docs)
