@@ -1,7 +1,4 @@
 #!/bin/bash
-# git -C rust-llvm remote add alexcrichton \
-#     https://github.com/alexcrichton/llvm.git
-# git -C rust-llvm fetch --depth=1 alexcrichton rust-llvm-2013-09-15
 mkdir llvm-3.4svn-1
 git -C rust-llvm archive alexcrichton/rust-llvm-2013-09-15 |
 tar -xf - -C llvm-3.4svn-1

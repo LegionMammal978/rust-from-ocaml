@@ -1,5 +1,4 @@
 #!/bin/bash
-# git -C rust-llvm fetch --depth=1 brson rust-20130523-do-not-delete
 mkdir llvm-3.3svn-1
 git -C rust-llvm archive brson/rust-20130523-do-not-delete |
 tar -xf - -C llvm-3.3svn-1

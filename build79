@@ -1,7 +1,4 @@
 #!/bin/bash
-# git init rust-llvm
-# git -C rust-llvm remote add brson https://github.com/brson/llvm.git
-# git -C rust-llvm fetch --depth=1 brson rust-20120106-do-not-delete
 base=$(pwd)
 mkdir llvm-3.1svn-3
 git -C rust-llvm archive brson/rust-20120106-do-not-delete |

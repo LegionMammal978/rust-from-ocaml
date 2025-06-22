@@ -1,5 +1,4 @@
 #!/bin/bash
-# git clone https://github.com/libuv/libuv.git
 base=$(pwd)
 git -C rust worktree add "$base"/rust-s20111109 \
     d26a96d2bbf78dcb4b5b43bf95137731ad0db286

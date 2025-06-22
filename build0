@@ -1,9 +1,15 @@
 #!/bin/bash
 sudo apt-get update
-sudo apt-get install -y apt-transport-https
-wget -O - https://download.sublimetext.com/sublimehq-pub.gpg |
-sudo apt-key add -
-echo 'deb https://download.sublimetext.com/ apt/stable/' |
-sudo tee /etc/apt/sources.list.d/sublime-text.list
-sudo apt-get update
-sudo apt-get install -y sublime-text
+sudo apt-get install -y curl g++-multilib git make ocaml-nox python-is-python2
+git clone https://chromium.googlesource.com/external/gyp.git
+git clone https://github.com/libuv/libuv.git
+git clone https://github.com/llvm/llvm-project.git
+git clone https://github.com/rust-lang/rust.git
+git init rust-llvm
+git -C rust config extensions.worktreeConfig true
+git -C rust-llvm remote add alexcrichton \
+    https://github.com/alexcrichton/llvm.git
+git -C rust-llvm remote add brson https://github.com/brson/llvm.git
+git -C rust-llvm fetch --depth=1 alexcrichton rust-llvm-2013-09-15
+git -C rust-llvm fetch --depth=1 brson rust-20130523-do-not-delete \
+    rust-20120106-do-not-delete

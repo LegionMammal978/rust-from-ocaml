@@ -1,7 +1,4 @@
 #!/bin/bash
-# sudo apt-get update
-# sudo apt-get install -y g++-multilib git make
-# git clone https://github.com/llvm/llvm-project.git
 mkdir llvm-3.0svn-1
 git -C llvm-project archive f200a0af58871778b3e8b727d7534aa82a6ca37f llvm |
 tar -xf - -C llvm-3.0svn-1 --strip-components=1

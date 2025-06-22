@@ -1,5 +1,4 @@
 #!/bin/bash
-# git clone https://chromium.googlesource.com/external/gyp.git
 base=$(pwd)
 git -C rust worktree add "$base"/rust-s20130917 \
     cbd1eefbd350797b783df119fed7956d7e1c74ad
