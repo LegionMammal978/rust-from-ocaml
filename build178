@@ -4,7 +4,7 @@ git -C rust worktree add "$base"/rust-s20130923 \
     348d8446739f9633897a3d728d265ee6ac59c8fb
 git -C rust-s20130923 config --worktree core.abbrev 7
 git -C libuv archive v0.11.11 | tar -xf - -C rust-s20130923/src/libuv
-git -C gyp archive master | tar -xf - -C rust-s20130923/src/gyp
+git -C gyp archive f407f09c94e00d2d570e8e42114e3f6848b2deb2 | tar -xf - -C rust-s20130923/src/gyp
 cd rust-s20130923
 patch -p1 <<EOF
 --- a/configure
