@@ -20,8 +20,8 @@ patch -d rust-s20110503 -p1 <<'EOF'
 --- a/mk/rt.mk
 +++ b/mk/rt.mk
 @@ -77 +77 @@
--   $(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS),$(RUNTIME_DEF))
-+   $(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS) -ldl -lpthread,$(RUNTIME_DEF))
+-	$(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS),$(RUNTIME_DEF))
++	$(Q)$(call CFG_LINK_C,$@,$(RUNTIME_LIBS) $(RUNTIME_OBJS) -ldl -lpthread,$(RUNTIME_DEF))
 --- a/src/boot/be/asm.ml
 +++ b/src/boot/be/asm.ml
 @@ -670,5 +670,5 @@

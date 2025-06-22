@@ -1,6 +1,6 @@
 #!/bin/bash
 base=$(pwd)
-git -C rust worktree add -f "$base"/rust-s20110814 \
+git -C rust worktree add "$base"/rust-s20110814 \
     83128f441b6857d048ed712bbfdb38cd2f5a9a13
 git -C rust-s20110814 config --worktree core.abbrev 7
 mkdir rust-s20110814/dl
