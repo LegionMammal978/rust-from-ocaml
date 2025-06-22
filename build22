@@ -6,8 +6,8 @@ git -C rust-s20110617 config --worktree core.abbrev 7
 mkdir rust-s20110617/dl
 cp rust-head-02c0501/$(< rust-head-02c0501/snap.txt) rust-s20110617/dl
 cat > rust-s20110617/src/snapshots.txt <<EOF
-S 2011-06-16 02c0501
-  linux-i386 $(cut -c 43-82 rust-head-02c0501/snap.txt)
+S 2011-06-16 $(cut -f 6 -d - rust-head-02c0501/snap.txt)
+  linux-i386 $(cut -f 9 -d - rust-head-02c0501/snap.txt | cut -f 1 -d .)
 EOF
 patch -d rust-s20110617 -p1 <<EOF
 --- a/mk/platform.mk

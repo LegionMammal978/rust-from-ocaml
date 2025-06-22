@@ -7,8 +7,8 @@ git -C libuv archive node-v0.7.5 | tar -xf - -C rust-s20120320/src/libuv
 mkdir rust-s20120320/dl
 cp rust-s20120316/$(< rust-s20120316/snap.txt) rust-s20120320/dl
 cat > rust-s20120320/src/snapshots.txt <<EOF
-S 2012-03-16 22bef74
-  linux-x86_64 $(cut -c 45-84 rust-s20120316/snap.txt)
+S 2012-03-16 $(cut -f 6 -d - rust-s20120316/snap.txt)
+  linux-x86_64 $(cut -f 9 -d - rust-s20120316/snap.txt | cut -f 1 -d .)
 EOF
 cd rust-s20120320
 patch -p1 <<EOF

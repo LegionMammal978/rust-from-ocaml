@@ -6,8 +6,8 @@ git -C rust-s20120607 config --worktree core.abbrev 7
 git -C libuv archive node-v0.7.5 | tar -xf - -C rust-s20120607/src/libuv
 install -Dt rust-s20120607/dl rust-s20120604/$(< rust-s20120604/snap.txt)
 cat > rust-s20120607/src/snapshots.txt <<EOF
-S 2012-06-04 7213274
-  linux-x86_64 $(cut -c 45-84 rust-s20120604/snap.txt)
+S 2012-06-04 $(cut -f 6 -d - rust-s20120604/snap.txt)
+  linux-x86_64 $(cut -f 9 -d - rust-s20120604/snap.txt | cut -f 1 -d .)
 EOF
 cd rust-s20120607
 patch -p1 <<EOF

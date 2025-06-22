@@ -6,8 +6,8 @@ git -C rust-s20111023 config --worktree core.abbrev 7
 mkdir rust-s20111023/dl
 cp rust-s20111021/$(< rust-s20111021/snap.txt) rust-s20111023/dl
 cat > rust-s20111023/src/snapshots.txt <<EOF
-S 2011-10-21 f134261
-  linux-i386 $(cut -c 43-82 rust-s20111021/snap.txt)
+S 2011-10-21 $(cut -f 6 -d - rust-s20111021/snap.txt)
+  linux-i386 $(cut -f 9 -d - rust-s20111021/snap.txt | cut -f 1 -d .)
 EOF
 cd rust-s20111023
 patch -p1 <<EOF
