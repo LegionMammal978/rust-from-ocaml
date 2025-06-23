@@ -1,6 +1,7 @@
 #!/bin/bash
 sudo apt-get update
-sudo apt-get install -y curl g++-multilib git make ocaml-nox python-is-python2
+sudo apt-get install -y curl g++-multilib git make ocaml-nox python-six \
+	python-is-python2
 git clone https://chromium.googlesource.com/external/gyp.git
 git clone https://github.com/libuv/libuv.git
 git clone https://github.com/llvm/llvm-project.git

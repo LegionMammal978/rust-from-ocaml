@@ -5,7 +5,8 @@ git -C rust worktree add "$base"/rust-s20140114 \
 cd rust-s20140114
 git config --worktree core.abbrev 7
 git -C "$base"/libuv archive v0.11.19 | tar -xf - -C src/libuv
-git -C "$base"/gyp archive master | tar -xf - -C src/gyp
+git -C "$base"/gyp archive 1615ec326858f8c2bd8f30b3a86ea71830409ce4 |
+tar -xf - -C src/gyp
 patch -p1 <<EOF
 --- a/mk/platform.mk
 +++ b/mk/platform.mk
