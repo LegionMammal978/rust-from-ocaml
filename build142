@@ -22,5 +22,5 @@ EOF
 ./configure --disable-docs --disable-manage-submodules --enable-local-rust \
     --local-rust-root="$base"/rust-s20120829/x86_64-unknown-linux-gnu/stage2 \
     --llvm-root="$base"/llvm-3.1svn-4/Release+Asserts
-make -j8 rustc-stage1
+make -j8 rustc
 printf '\a'
